@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="ms-MY">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kemahiran Pemulihan: Operasi Wang (Eksplorasi)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -10,92 +11,211 @@
 
   <style>
     /* --- UI STYLE (TEMA HIJAU KONSISTEN) --- */
-    body { 
-        font-family: 'Fredoka', sans-serif; 
-        background-color: #f0fdf4; 
-        background-image: radial-gradient(#86efac 2px, transparent 2px); 
-        background-size: 30px 30px; 
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background-color: #f0fdf4;
+      background-image: radial-gradient(#86efac 2px, transparent 2px);
+      background-size: 30px 30px;
     }
-    
+
     /* Card Container */
-    .game-card { 
-        background: white; 
-        border: 4px solid #475569; 
-        box-shadow: 8px 8px 0px #00000020; 
-        border-radius: 1.5rem; 
-        transition: transform 0.2s; 
-        min-height: 550px; 
+    .game-card {
+      background: white;
+      border: 4px solid #475569;
+      box-shadow: 8px 8px 0px #00000020;
+      border-radius: 1.5rem;
+      transition: transform 0.2s;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
-    
+
     /* Buttons 3D */
-    .btn-3d { transition: all 0.1s; border-bottom-width: 6px; border-color: rgba(0,0,0,0.2); transform: translateY(0); cursor: pointer; display: inline-block; }
-    .btn-3d:active:not(:disabled) { transform: translateY(4px); border-bottom-width: 2px; box-shadow: none; }
-    .btn-3d:disabled { opacity: 0.6; cursor: not-allowed; border-bottom-width: 6px; filter: grayscale(100%); }
+    .btn-3d {
+      transition: all 0.1s;
+      border-bottom-width: 6px;
+      border-color: rgba(0, 0, 0, 0.2);
+      transform: translateY(0);
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .btn-3d:active:not(:disabled) {
+      transform: translateY(4px);
+      border-bottom-width: 2px;
+      box-shadow: none;
+    }
+
+    .btn-3d:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      border-bottom-width: 6px;
+      filter: grayscale(100%);
+    }
 
     /* Animation & Drag */
-    .shake { animation: shake 0.4s ease-in-out; border-color: #ef4444 !important; background-color: #fee2e2 !important; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px) rotate(-5deg); } 75% { transform: translateX(8px) rotate(5deg); } }
-    
-    .drag-item { cursor: grab; user-select: none; transition: transform 0.1s; }
-    .drag-item:active { cursor: grabbing; transform: scale(0.95); }
-    .dragging { opacity: 0.5; transform: rotate(5deg) scale(1.1); }
+    .shake {
+      animation: shake 0.4s ease-in-out;
+      border-color: #ef4444 !important;
+      background-color: #fee2e2 !important;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-8px) rotate(-5deg);
+      }
+
+      75% {
+        transform: translateX(8px) rotate(5deg);
+      }
+    }
+
+    .drag-item {
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.1s;
+    }
+
+    .drag-item:active {
+      cursor: grabbing;
+      transform: scale(0.95);
+    }
+
+    .dragging {
+      opacity: 0.5;
+      transform: rotate(5deg) scale(1.1);
+    }
 
     /* Drop Zones */
-    .drop-zone { border: 3px dashed #94a3b8; background-color: #f8fafc; transition: all .3s ease; border-radius: 1rem; min-height: 100px; }
-    .drop-zone.drag-over { border-color: #3b82f6; background-color: #dbeafe; transform: scale(1.02); }
-    .drop-zone-filled { border: 3px solid #22c55e; background-color: #dcfce7; }
+    .drop-zone {
+      border: 3px dashed #94a3b8;
+      background-color: #f8fafc;
+      transition: all .3s ease;
+      border-radius: 1rem;
+      min-height: 100px;
+    }
+
+    .drop-zone.drag-over {
+      border-color: #3b82f6;
+      background-color: #dbeafe;
+      transform: scale(1.02);
+    }
+
+    .drop-zone-filled {
+      border: 3px solid #22c55e;
+      background-color: #dcfce7;
+    }
 
     /* Money Specific Colors (Untuk drag items) */
-    .money-bg-100 { background-color: #d8b4fe; border-color: #a855f7; color: #581c87; }
-    .money-bg-50 { background-color: #a5f3fc; border-color: #0891b2; color: #164e63; }
-    .money-bg-20 { background-color: #fcd34d; border-color: #d97706; color: #78350f; }
-    .money-bg-10 { background-color: #fda4af; border-color: #e11d48; color: #881337; }
-    .money-bg-5 { background-color: #a7f3d0; border-color: #059669; color: #064e3b; }
-    .money-bg-1 { background-color: #bfdbfe; border-color: #2563eb; color: #1e3a8a; }
-    .money-bg-sen { background-color: #fde68a; border-color: #ca8a04; color: #854d0e; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+    .money-bg-100 {
+      background-color: #d8b4fe;
+      border-color: #a855f7;
+      color: #581c87;
+    }
 
+    .money-bg-50 {
+      background-color: #a5f3fc;
+      border-color: #0891b2;
+      color: #164e63;
+    }
+
+    .money-bg-20 {
+      background-color: #fcd34d;
+      border-color: #d97706;
+      color: #78350f;
+    }
+
+    .money-bg-10 {
+      background-color: #fda4af;
+      border-color: #e11d48;
+      color: #881337;
+    }
+
+    .money-bg-5 {
+      background-color: #a7f3d0;
+      border-color: #059669;
+      color: #064e3b;
+    }
+
+    .money-bg-1 {
+      background-color: #bfdbfe;
+      border-color: #2563eb;
+      color: #1e3a8a;
+    }
+
+    .money-bg-sen {
+      background-color: #fde68a;
+      border-color: #ca8a04;
+      color: #854d0e;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
-<body class="min-h-screen text-slate-800 pb-10">
+</head>
 
-  <div class="fixed top-4 left-0 right-0 z-50 px-4 pointer-events-none">
-    <div class="max-w-4xl mx-auto bg-green-400 border-4 border-green-600 rounded-full px-6 py-3 shadow-xl flex items-center justify-between pointer-events-auto transform hover:scale-[1.01] transition-transform">
-      <div class="flex items-center gap-3">
-        <span class="text-3xl animate-bounce">💰</span>
-        <span id="info-text" class="text-xl font-bold text-green-900 leading-none mt-1">Jom Belajar Operasi Wang!</span>
+<body class="h-screen w-screen overflow-hidden text-slate-800 flex flex-col overscroll-none">
+
+  <div class="fixed top-2 left-0 right-0 z-50 px-4 pointer-events-none">
+    <div
+      class="max-w-4xl mx-auto bg-green-400 border-4 border-green-600 rounded-full px-4 py-1.5 shadow-xl flex items-center justify-between pointer-events-auto transform hover:scale-[1.01] transition-transform">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl animate-bounce">💰</span>
+        <span id="info-text" class="text-base font-bold text-green-900 leading-none mt-0.5">Jom Belajar Operasi
+          Wang!</span>
       </div>
-      <button id="speak-btn" onclick="speakInfo()" class="bg-white hover:bg-green-50 text-green-600 border-2 border-green-200 rounded-full p-2 transition-colors shadow-sm">🔊</button>
+      <button id="speak-btn" onclick="speakInfo()"
+        class="bg-white hover:bg-green-50 text-green-600 border-2 border-green-200 rounded-full p-1 transition-colors shadow-sm text-sm">🔊</button>
     </div>
   </div>
-  <div class="h-24"></div>
+  <div class="h-16 flex-none"></div>
 
-  <div class="max-w-6xl mx-auto p-4">
-    
-    <div class="game-card p-8 mb-8 flex items-center justify-center relative">
-        <div id="activity-content" class="w-full relative z-10">
-            <div class="py-10 text-center">
-                <div class="text-8xl mb-6 animate-pulse">💸</div>
-                <h2 class="text-5xl font-bold text-emerald-600 mb-4">Operasi Wang</h2>
-                <p class="text-2xl text-slate-500 mb-8 font-semibold">Kira, Darab, Bahagi & Baki</p>
-                <div class="text-4xl animate-bounce">👇</div>
-            </div>
+  <div class="max-w-6xl mx-auto p-2 w-full flex-1 flex flex-col overflow-hidden min-h-0">
+
+    <div class="game-card p-4 mb-2 flex items-center justify-center relative w-full">
+      <div id="activity-content" class="w-full h-full relative z-10 flex flex-col">
+        <div class="py-4 text-center">
+          <div class="text-6xl mb-2 animate-pulse">💸</div>
+          <h2 class="text-3xl font-bold text-emerald-600 mb-2">Operasi Wang</h2>
+          <p class="text-lg text-slate-500 mb-4 font-semibold">Kira, Darab, Bahagi & Baki</p>
+          <div class="text-2xl animate-bounce">👇</div>
         </div>
+      </div>
     </div>
 
-    <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg p-6 border-2 border-white">
-      <h3 class="text-2xl font-bold text-slate-700 mb-4 text-center">🎮 Pilih Aktiviti</h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        <button onclick="loadActivity(1)" class="btn-3d bg-blue-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🎯 Kira Duit</button>
-        <button onclick="loadActivity(2)" class="btn-3d bg-emerald-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🛒 Beli (Darab)</button>
-        <button onclick="loadActivity(3)" class="btn-3d bg-violet-500 text-white font-bold py-4 px-2 rounded-xl text-lg">💸 Kongsi (Bahagi)</button>
-        <button onclick="loadActivity(4)" class="btn-3d bg-orange-500 text-white font-bold py-4 px-2 rounded-xl text-lg">🪙 Baki & Bayar</button>
-        <button onclick="loadActivity(5)" class="btn-3d bg-rose-500 text-white font-bold py-4 px-2 rounded-xl text-lg">⚖️ Banding Nilai</button>
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-2 border-2 border-white flex-none">
+      <h3 class="text-sm font-bold text-slate-700 mb-2 text-center uppercase tracking-wider">🎮 Pilih Aktiviti</h3>
+
+      <div class="flex flex-wrap justify-center gap-2 mb-2">
+        <button onclick="loadActivity(1)"
+          class="btn-3d bg-blue-500 text-white font-bold py-2 px-3 rounded-lg text-xs">🎯 Kira Duit</button>
+        <button onclick="loadActivity(2)"
+          class="btn-3d bg-emerald-500 text-white font-bold py-2 px-3 rounded-lg text-xs">🛒 Beli (Darab)</button>
+        <button onclick="loadActivity(3)"
+          class="btn-3d bg-violet-500 text-white font-bold py-2 px-3 rounded-lg text-xs">💸 Kongsi (Bahagi)</button>
+        <button onclick="loadActivity(4)"
+          class="btn-3d bg-orange-500 text-white font-bold py-2 px-3 rounded-lg text-xs">🪙 Baki & Bayar</button>
+        <button onclick="loadActivity(5)"
+          class="btn-3d bg-rose-500 text-white font-bold py-2 px-3 rounded-lg text-xs">⚖️ Banding Nilai</button>
       </div>
 
-      <div class="flex justify-center gap-4 border-t-2 border-slate-100 pt-6">
-        <button onclick="clearActivity()" class="btn-3d bg-slate-400 text-white font-bold py-2 px-6 rounded-full text-lg">🏠 Menu</button>
-        <button onclick="nextActivity()" class="btn-3d bg-indigo-500 text-white font-bold py-2 px-8 rounded-full text-xl">Seterusnya ➡️</button>
+      <div class="flex justify-center gap-2 border-t-2 border-slate-100 pt-2">
+        <button onclick="clearActivity()"
+          class="btn-3d bg-slate-400 text-white font-bold py-1 px-4 rounded-full text-xs">🏠 Menu</button>
+        <button onclick="nextActivity()"
+          class="btn-3d bg-indigo-500 text-white font-bold py-1 px-6 rounded-full text-sm">Seterusnya ➡️</button>
       </div>
     </div>
   </div>
@@ -109,61 +229,61 @@
     window.activityState = {};
 
     function triggerWin() { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } }); }
-    
-    function speak(text) { 
-        if (!ttsEnabled || !('speechSynthesis' in window)) return; 
-        window.speechSynthesis.cancel(); 
-        const u = new SpeechSynthesisUtterance(text); 
-        u.lang = 'ms-MY'; u.rate = 0.9; u.pitch = 1.1; 
-        const voices = window.speechSynthesis.getVoices(); 
-        const ms = voices.find(v => v.lang === 'ms-MY' || v.lang?.startsWith('ms')); 
-        if (ms) u.voice = ms; 
-        window.speechSynthesis.speak(u); 
+
+    function speak(text) {
+      if (!ttsEnabled || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ms-MY'; u.rate = 0.9; u.pitch = 1.1;
+      const voices = window.speechSynthesis.getVoices();
+      const ms = voices.find(v => v.lang === 'ms-MY' || v.lang?.startsWith('ms'));
+      if (ms) u.voice = ms;
+      window.speechSynthesis.speak(u);
     }
-    
-    function setInfo(text) { 
-        currentInfo = text; 
-        const infoEl = document.getElementById('info-text'); 
-        infoEl.style.opacity = 0; 
-        setTimeout(() => { infoEl.textContent = text; infoEl.style.opacity = 1; }, 200); 
+
+    function setInfo(text) {
+      currentInfo = text;
+      const infoEl = document.getElementById('info-text');
+      infoEl.style.opacity = 0;
+      setTimeout(() => { infoEl.textContent = text; infoEl.style.opacity = 1; }, 200);
     }
-    
-    function speakInfo() { 
-        if (!ttsEnabled) { 
-            ttsEnabled = true; 
-            document.getElementById('speak-btn').classList.add('bg-green-100', 'text-green-600'); 
-        } 
-        speak(currentInfo); 
+
+    function speakInfo() {
+      if (!ttsEnabled) {
+        ttsEnabled = true;
+        document.getElementById('speak-btn').classList.add('bg-green-100', 'text-green-600');
+      }
+      speak(currentInfo);
     }
 
     /* --- HELPER UNTUK CLASS WANG --- */
     function getMoneyClass(val) {
-        if (val == 100) return "money-bg-100";
-        if (val == 50) return "money-bg-50";
-        if (val == 20) return "money-bg-20";
-        if (val == 10) return "money-bg-10";
-        if (val == 5) return "money-bg-5";
-        if (val == 1) return "money-bg-1";
-        return "money-bg-sen";
+      if (val == 100) return "money-bg-100";
+      if (val == 50) return "money-bg-50";
+      if (val == 20) return "money-bg-20";
+      if (val == 10) return "money-bg-10";
+      if (val == 5) return "money-bg-5";
+      if (val == 1) return "money-bg-1";
+      return "money-bg-sen";
     }
 
     /* --- DnD HELPERS --- */
-    window.dragStart = function(e) { 
-        draggedElement = e.target; 
-        e.target.classList.add('dragging'); 
-        if(e.target.dataset.value) e.dataTransfer.setData('value', e.target.dataset.value);
+    window.dragStart = function (e) {
+      draggedElement = e.target;
+      e.target.classList.add('dragging');
+      if (e.target.dataset.value) e.dataTransfer.setData('value', e.target.dataset.value);
     }
-    window.dragEnd = function(e) { 
-        if(draggedElement) draggedElement.classList.remove('dragging'); 
-        document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('drag-over')); 
-        draggedElement = null;
+    window.dragEnd = function (e) {
+      if (draggedElement) draggedElement.classList.remove('dragging');
+      document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+      draggedElement = null;
     }
-    window.allowDrop = function(e) { 
-        e.preventDefault(); 
-        if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.add('drag-over'); 
+    window.allowDrop = function (e) {
+      e.preventDefault();
+      if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.add('drag-over');
     }
-    window.dragLeave = function(e) { 
-        if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.remove('drag-over'); 
+    window.dragLeave = function (e) {
+      if (e.currentTarget.classList.contains('drop-zone')) e.currentTarget.classList.remove('drag-over');
     }
 
     /* --- ROUTER --- */
@@ -172,19 +292,19 @@
       const content = document.getElementById('activity-content');
       content.style.opacity = 0;
       setTimeout(() => {
-          if (n === 1) loadCountMoneyActivity(content);
-          if (n === 2) loadShoppingActivity(content);
-          if (n === 3) loadSharingActivity(content);
-          if (n === 4) loadChangeActivity(content);
-          if (n === 5) loadCompareActivity(content);
-          content.style.opacity = 1;
+        if (n === 1) loadCountMoneyActivity(content);
+        if (n === 2) loadShoppingActivity(content);
+        if (n === 3) loadSharingActivity(content);
+        if (n === 4) loadChangeActivity(content);
+        if (n === 5) loadCompareActivity(content);
+        content.style.opacity = 1;
       }, 200);
     }
 
     function clearActivity() {
-        currentActivity = 0;
-        document.getElementById('activity-content').innerHTML = `<div class="py-10 text-center"><div class="text-8xl mb-6 animate-bounce">💸</div><h2 class="text-5xl font-bold text-emerald-600 mb-4">Operasi Wang</h2><p class="text-2xl text-slate-500 mb-8 font-semibold">Pilih butang di bawah.</p></div>`;
-        setInfo("Pilih aktiviti untuk mula.");
+      currentActivity = 0;
+      document.getElementById('activity-content').innerHTML = `<div class="h-full flex flex-col justify-center items-center py-4 text-center"><div class="text-6xl mb-4 animate-bounce">💸</div><h2 class="text-3xl font-bold text-emerald-600 mb-2">Operasi Wang</h2><p class="text-lg text-slate-500 font-semibold">Pilih butang di bawah.</p></div>`;
+      setInfo("Pilih aktiviti untuk mula.");
     }
     function nextActivity() { let next = currentActivity + 1; if (next > 5) next = 1; loadActivity(next); }
 
@@ -198,24 +318,27 @@
       window.activityState = { total: 0, items: [] };
 
       content.innerHTML = `
-        <h3 class="text-4xl font-bold text-blue-500 mb-6 text-center">🎯 Kira Duit (Operasi Tambah)</h3>
-        <div class="max-w-2xl mx-auto bg-blue-50 rounded-3xl p-6 border-4 border-blue-200 mb-6">
-          <div id="counting-display" class="min-h-[120px] flex flex-wrap gap-2 justify-center items-center bg-white rounded-xl border-2 border-blue-100 p-4">
-            <span class="text-slate-400 font-bold">Tabung Kosong</span>
-          </div>
-          <div id="counting-total" class="mt-4 text-4xl font-black text-blue-700 text-center">Jumlah: RM 0.00</div>
-        </div>
-        
-        <div class="flex flex-wrap justify-center gap-3">
-          ${[100, 50, 20, 10, 5, 1, 0.20].map(val => `
-            <button class="btn-3d ${getMoneyClass(val)} font-bold py-3 px-4 rounded-xl border-b-4 shadow-sm text-lg" 
-                    onclick="addMoney(${val})">
-              ${val < 1 ? (val*100)+' sen' : 'RM'+val}
-            </button>
-          `).join('')}
-        </div>
-        <div class="text-center mt-6">
-             <button class="text-slate-400 underline font-bold" onclick="loadCountMoneyActivity(document.getElementById('activity-content'))">Reset Tabung</button>
+        <h3 class="text-xl font-bold text-blue-500 mb-2 text-center flex-none">🎯 Kira Duit (Operasi Tambah)</h3>
+        <div class="flex-1 overflow-hidden p-2 flex flex-col items-center">
+            <div class="max-w-4xl w-full flex flex-col md:flex-row gap-4 h-full">
+                <div class="bg-blue-50 rounded-2xl p-4 border-2 border-blue-200 md:w-1/2 flex flex-col">
+                     <h4 class="font-bold text-blue-800 text-center mb-2 text-sm">Tabung</h4>
+                     <div id="counting-display" class="flex-grow flex flex-wrap gap-1 content-start justify-center items-start bg-white rounded-xl border-2 border-blue-100 p-2 overflow-y-auto">
+                        <span class="text-slate-400 font-bold text-xs mt-4">Tabung Kosong</span>
+                     </div>
+                     <div id="counting-total" class="mt-2 text-2xl font-black text-blue-700 text-center">Jumlah: RM 0.00</div>
+                     <button class="text-slate-400 text-xs underline font-bold mt-1 text-center" onclick="loadCountMoneyActivity(document.getElementById('activity-content'))">Reset Tabung</button>
+                </div>
+                
+                <div class="md:w-1/2 flex flex-wrap justify-center content-center gap-2">
+                  ${[100, 50, 20, 10, 5, 1, 0.20].map(val => `
+                    <button class="btn-3d ${getMoneyClass(val)} font-bold py-2 px-3 rounded-xl border-b-4 shadow-sm text-sm" 
+                            onclick="addMoney(${val})">
+                      ${val < 1 ? (val * 100) + ' sen' : 'RM' + val}
+                    </button>
+                  `).join('')}
+                </div>
+            </div>
         </div>
       `;
     }
@@ -223,16 +346,16 @@
     function addMoney(val) {
       window.activityState.total += val;
       window.activityState.items.push(val);
-      
+
       const totalEl = document.getElementById('counting-total');
       const displayEl = document.getElementById('counting-display');
-      
+
       totalEl.textContent = `Jumlah: RM ${window.activityState.total.toFixed(2)}`;
-      displayEl.innerHTML = window.activityState.items.map(v => 
-        `<span class="${getMoneyClass(v)} border-2 px-2 py-1 rounded font-bold text-sm shadow-sm inline-block m-1">${v < 1 ? (v*100)+'s' : 'RM'+v}</span>`
+      displayEl.innerHTML = window.activityState.items.map(v =>
+        `<span class="${getMoneyClass(v)} border-2 px-2 py-1 rounded font-bold text-sm shadow-sm inline-block m-1">${v < 1 ? (v * 100) + 's' : 'RM' + v}</span>`
       ).join('');
-      
-      const msg = `Tambah ${val < 1 ? (val*100)+' sen' : 'RM'+val}. Jumlah RM ${window.activityState.total.toFixed(2)}`;
+
+      const msg = `Tambah ${val < 1 ? (val * 100) + ' sen' : 'RM' + val}. Jumlah RM ${window.activityState.total.toFixed(2)}`;
       setInfo(msg); speak(msg);
     }
 
@@ -240,36 +363,37 @@
     function loadShoppingActivity(content) {
       setInfo("Pilih barang, kemudian pilih kuantiti.");
       window.activityState = { price: 0, item: "" };
-      
-      content.innerHTML = `
-        <h3 class="text-4xl font-bold text-emerald-500 mb-6 text-center">🛒 Beli-Belah (Operasi Darab)</h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 max-w-3xl mx-auto">
-          <button class="item-card btn-3d bg-white border-emerald-200 text-slate-700 p-4 rounded-xl flex flex-col items-center" onclick="selectItem(15, 'Buku')">
-            <div class="text-5xl mb-2">📚</div>
-            <div class="font-bold">Buku</div>
-            <div class="text-emerald-600 font-black text-xl">RM 15</div>
-          </button>
-          <button class="item-card btn-3d bg-white border-emerald-200 text-slate-700 p-4 rounded-xl flex flex-col items-center" onclick="selectItem(25, 'Baju')">
-            <div class="text-5xl mb-2">👕</div>
-            <div class="font-bold">Baju</div>
-            <div class="text-emerald-600 font-black text-xl">RM 25</div>
-          </button>
-          <button class="item-card btn-3d bg-white border-emerald-200 text-slate-700 p-4 rounded-xl flex flex-col items-center" onclick="selectItem(8, 'Mainan')">
-            <div class="text-5xl mb-2">🧸</div>
-            <div class="font-bold">Mainan</div>
-            <div class="text-emerald-600 font-black text-xl">RM 8</div>
-          </button>
-        </div>
 
-        <div id="shopping-calc" class="hidden text-center bg-emerald-50 p-6 rounded-3xl border-4 border-emerald-200 max-w-2xl mx-auto">
-           <h4 class="text-lg font-bold text-slate-500 mb-4">Pilih Kuantiti (Berapa banyak?):</h4>
-           <div class="flex justify-center gap-4 mb-6">
-             ${[2, 3, 4, 5].map(q => `
-               <button class="btn-3d bg-emerald-500 text-white font-bold py-2 px-6 rounded-lg text-xl" onclick="calculateShopping(${q})">x${q}</button>
-             `).join('')}
-           </div>
-           <div id="shopping-result" class="bg-white p-4 rounded-xl min-h-[50px] text-xl font-mono text-slate-700 text-left border-2 border-emerald-100"></div>
+      content.innerHTML = `
+        <h3 class="text-xl font-bold text-emerald-500 mb-2 text-center flex-none">🛒 Beli-Belah (Operasi Darab)</h3>
+        <div class="flex-1 overflow-y-auto w-full px-4 flex flex-col items-center">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4 w-full max-w-3xl flex-none">
+              <button class="item-card btn-3d bg-white border-emerald-200 text-slate-700 p-2 rounded-xl flex flex-col items-center" onclick="selectItem(15, 'Buku')">
+                <div class="text-3xl mb-1">📚</div>
+                <div class="font-bold text-sm">Buku</div>
+                <div class="text-emerald-600 font-black text-base">RM 15</div>
+              </button>
+              <button class="item-card btn-3d bg-white border-emerald-200 text-slate-700 p-2 rounded-xl flex flex-col items-center" onclick="selectItem(25, 'Baju')">
+                <div class="text-3xl mb-1">👕</div>
+                <div class="font-bold text-sm">Baju</div>
+                <div class="text-emerald-600 font-black text-base">RM 25</div>
+              </button>
+              <button class="item-card btn-3d bg-white border-emerald-200 text-slate-700 p-2 rounded-xl flex flex-col items-center" onclick="selectItem(8, 'Mainan')">
+                <div class="text-3xl mb-1">🧸</div>
+                <div class="font-bold text-sm">Mainan</div>
+                <div class="text-emerald-600 font-black text-base">RM 8</div>
+              </button>
+            </div>
+
+            <div id="shopping-calc" class="hidden text-center bg-emerald-50 p-4 rounded-2xl border-4 border-emerald-200 w-full max-w-2xl flex-none">
+               <h4 class="text-sm font-bold text-slate-500 mb-2">Pilih Kuantiti (Berapa banyak?):</h4>
+               <div class="flex justify-center gap-2 mb-4">
+                 ${[2, 3, 4, 5].map(q => `
+                   <button class="btn-3d bg-emerald-500 text-white font-bold py-1.5 px-4 rounded-lg text-lg" onclick="calculateShopping(${q})">x${q}</button>
+                 `).join('')}
+               </div>
+               <div id="shopping-result" class="bg-white p-2 rounded-xl min-h-[50px] text-base font-mono text-slate-700 text-left border-2 border-emerald-100"></div>
+            </div>
         </div>
       `;
     }
@@ -278,10 +402,10 @@
       window.activityState = { price, item };
       document.querySelectorAll('.item-card').forEach(c => c.classList.replace('border-emerald-500', 'border-emerald-200'));
       event.currentTarget.classList.replace('border-emerald-200', 'border-emerald-500');
-      
+
       document.getElementById('shopping-calc').classList.remove('hidden');
       document.getElementById('shopping-result').innerHTML = "<span class='text-slate-400 italic'>Sila pilih kuantiti di atas...</span>";
-      
+
       const msg = `Pilih ${item} RM${price}. Nak beli berapa?`;
       setInfo(msg); speak(msg);
     }
@@ -290,8 +414,8 @@
       const { price, item } = window.activityState;
       const total = price * qty;
       let steps = "";
-      for(let i=1; i<=qty; i++) steps += `<div>${item} #${i} = RM ${price}</div>`;
-      
+      for (let i = 1; i <= qty; i++) steps += `<div>${item} #${i} = RM ${price}</div>`;
+
       document.getElementById('shopping-result').innerHTML = `
         <div class="text-sm text-slate-400 mb-2">Jalan Kira (Tambah Berulang):</div>
         <div class="mb-3 pl-4 border-l-4 border-emerald-200">${steps}</div>
@@ -315,239 +439,245 @@
     }
 
     function renderShareActivity() {
-       const content = document.getElementById('activity-content');
-       const { total, people, money, personTotals } = window.activityState;
-       
-       // Helper Avatar
-       const avatars = ['👦', '👧', '🧒'];
+      const content = document.getElementById('activity-content');
+      const { total, people, money, personTotals } = window.activityState;
 
-       content.innerHTML = `
-         <h3 class="text-4xl font-bold text-violet-500 mb-2 text-center">💸 Mari Kongsi (Operasi Bahagi)</h3>
-         <p class="text-center text-slate-500 mb-6 font-bold">Agihkan RM ${total} kepada ${people} orang kawan.</p>
+      // Helper Avatar
+      const avatars = ['👦', '👧', '🧒'];
 
-         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-            <div class="bg-violet-50 p-4 rounded-3xl border-4 border-violet-200 flex flex-col">
-                <h4 class="font-bold text-violet-700 mb-2 text-center">Wang Untuk Diagih</h4>
-                <div class="flex flex-wrap justify-center gap-2 mb-4 min-h-[80px] bg-white p-2 rounded-xl border-2 border-violet-100">
-                    ${money.map(val => `
-                        <div class="drag-item ${getMoneyClass(val)} font-bold p-2 rounded-lg border-2 text-sm shadow-sm" 
-                             draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)" data-value="${val}">
-                             ${val < 1 ? (val*100)+'s' : 'RM'+val}
+      content.innerHTML = `
+        <h3 class="text-xl font-bold text-violet-500 mb-2 text-center flex-none">💸 Mari Kongsi (Operasi Bahagi)</h3>
+         <p class="text-center text-slate-500 mb-2 font-bold text-xs flex-none">Agihkan RM ${total} kepada ${people} orang kawan.</p>
+
+         <div class="flex-1 overflow-hidden p-2 w-full flex flex-col items-center">
+             <div class="flex flex-col md:flex-row gap-4 h-full w-full max-w-4xl">
+                <div class="md:w-1/2 bg-violet-50 p-2 rounded-2xl border-4 border-violet-200 flex flex-col overflow-hidden">
+                    <h4 class="font-bold text-violet-700 mb-1 text-center text-xs">Wang Untuk Diagih</h4>
+                    <div class="flex flex-wrap justify-center gap-1 mb-2 min-h-[60px] bg-white p-2 rounded-xl border-2 border-violet-100 overflow-y-auto flex-none">
+                        ${money.map(val => `
+                            <div class="drag-item ${getMoneyClass(val)} font-bold p-1 rounded-lg border-2 text-xs shadow-sm" 
+                                 draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)" data-value="${val}">
+                                 ${val < 1 ? (val * 100) + 's' : 'RM' + val}
+                            </div>
+                        `).join('')}
+                        ${money.length === 0 ? '<span class="text-slate-300 font-bold self-center text-xs">Wang Habis!</span>' : ''}
+                    </div>
+                    
+                    <div class="drop-zone bg-white rounded-xl p-2 text-center border-dashed border-2 border-violet-300 flex-grow flex items-center justify-center min-h-[60px]"
+                         ondrop="dropOnChanger(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                         <div>
+                            <div class="text-2xl mb-1">🏧</div>
+                            <span class="text-violet-400 font-bold text-xs">Mesin Tukar Wang</span>
+                         </div>
+                    </div>
+                </div>
+
+                <div class="md:w-1/2 overflow-y-auto space-y-2 pr-1">
+                    ${personTotals.map((pTotal, i) => `
+                        <div class="bg-white border-2 border-slate-200 rounded-xl p-2 flex items-center gap-2">
+                            <div class="text-2xl bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center flex-none">${avatars[i]}</div>
+                            <div class="flex-grow">
+                                 <div class="font-bold text-slate-600 text-xs text-left">Kawan ${i + 1}</div>
+                                 <div class="text-xs text-violet-500 font-bold text-left">Dapat: RM ${pTotal.toFixed(2)}</div>
+                            </div>
+                            <div class="drop-zone w-16 h-12 bg-slate-50 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center text-[10px] text-slate-400 flex-none"
+                                 data-person-id="${i}" ondrop="dropOnPerson(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                 Letak Sini
+                            </div>
                         </div>
                     `).join('')}
-                    ${money.length===0 ? '<span class="text-slate-300 font-bold self-center">Wang Habis!</span>' : ''}
                 </div>
-                
-                <div class="drop-zone bg-white rounded-xl p-4 text-center border-dashed border-4 border-violet-300 flex-grow flex items-center justify-center"
-                     ondrop="dropOnChanger(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                     <div>
-                        <div class="text-3xl mb-1">🏧</div>
-                        <span class="text-violet-400 font-bold text-sm">Mesin Tukar Wang<br>(Seret ke sini)</span>
-                     </div>
-                </div>
-            </div>
-
-            <div class="space-y-3">
-                ${personTotals.map((pTotal, i) => `
-                    <div class="bg-white border-2 border-slate-200 rounded-2xl p-3 flex items-center gap-3">
-                        <div class="text-4xl bg-slate-100 rounded-full w-16 h-16 flex items-center justify-center">${avatars[i]}</div>
-                        <div class="flex-grow">
-                             <div class="font-bold text-slate-600">Kawan ${i+1}</div>
-                             <div class="text-sm text-violet-500 font-bold">Dapat: RM ${pTotal.toFixed(2)}</div>
-                        </div>
-                        <div class="drop-zone w-24 h-16 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center text-xs text-slate-400"
-                             data-person-id="${i}" ondrop="dropOnPerson(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                             Letak Sini
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
+             </div>
          </div>
-       `;
-       setInfo("Seret wang kepada kawan-kawan. Pastikan sama rata!");
+      `;
+      setInfo("Seret wang kepada kawan-kawan. Pastikan sama rata!");
     }
 
-    window.dropOnChanger = function(e) {
-        e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
-        const val = parseFloat(draggedElement.dataset.value);
-        
-        let newNotes = [];
-        if (val == 50) newNotes = [20, 20, 10];
-        else if (val == 20) newNotes = [10, 10];
-        else if (val == 10) newNotes = [5, 5];
-        else if (val == 5) newNotes = [1, 1, 1, 1, 1];
-        else if (val == 1) newNotes = [0.20, 0.20, 0.20, 0.20, 0.20];
-        else { speak("Tak boleh tukar lagi."); return; }
+    window.dropOnChanger = function (e) {
+      e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
+      const val = parseFloat(draggedElement.dataset.value);
 
-        const idx = window.activityState.money.indexOf(val);
-        if(idx > -1) window.activityState.money.splice(idx, 1);
-        window.activityState.money.push(...newNotes);
-        
-        speak(`Tukar RM ${val}`);
-        renderShareActivity();
+      let newNotes = [];
+      if (val == 50) newNotes = [20, 20, 10];
+      else if (val == 20) newNotes = [10, 10];
+      else if (val == 10) newNotes = [5, 5];
+      else if (val == 5) newNotes = [1, 1, 1, 1, 1];
+      else if (val == 1) newNotes = [0.20, 0.20, 0.20, 0.20, 0.20];
+      else { speak("Tak boleh tukar lagi."); return; }
+
+      const idx = window.activityState.money.indexOf(val);
+      if (idx > -1) window.activityState.money.splice(idx, 1);
+      window.activityState.money.push(...newNotes);
+
+      speak(`Tukar RM ${val} `);
+      renderShareActivity();
     }
 
-    window.dropOnPerson = function(e) {
-        e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
-        const val = parseFloat(draggedElement.dataset.value);
-        const pid = parseInt(e.currentTarget.dataset.personId);
-        
-        // Logic check simple
-        const idx = window.activityState.money.indexOf(val);
-        if(idx > -1) window.activityState.money.splice(idx, 1);
-        
-        window.activityState.personTotals[pid] += val;
-        speak(`Beri RM ${val} pada Kawan ${pid+1}`);
-        renderShareActivity();
+    window.dropOnPerson = function (e) {
+      e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
+      const val = parseFloat(draggedElement.dataset.value);
+      const pid = parseInt(e.currentTarget.dataset.personId);
 
-        // Check Win
-        if(window.activityState.money.length === 0) {
-            const totals = window.activityState.personTotals;
-            if(totals.every(t => t === totals[0] && t > 0)) {
-                setInfo("Syabas! Semua dapat sama rata.");
-                triggerWin();
-            }
+      // Logic check simple
+      const idx = window.activityState.money.indexOf(val);
+      if (idx > -1) window.activityState.money.splice(idx, 1);
+
+      window.activityState.personTotals[pid] += val;
+      speak(`Beri RM ${val} pada Kawan ${pid + 1} `);
+      renderShareActivity();
+
+      // Check Win
+      if (window.activityState.money.length === 0) {
+        const totals = window.activityState.personTotals;
+        if (totals.every(t => t === totals[0] && t > 0)) {
+          setInfo("Syabas! Semua dapat sama rata.");
+          triggerWin();
         }
+      }
     }
 
     /* --- 4. BAYAR & BAKI --- */
     function loadChangeActivity(content) {
-        const price = 138;
-        setInfo(`Harga RM${price}. Bayar guna dompet.`);
-        window.activityState = { price, paid: 0 };
+      const price = 138;
+      setInfo(`Harga RM${price}. Bayar guna dompet.`);
+      window.activityState = { price, paid: 0 };
 
-        content.innerHTML = `
-            <h3 class="text-4xl font-bold text-orange-500 mb-6 text-center">🪙 Bayar & Baki (Operasi Tolak)</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-white border-2 border-slate-200 rounded-3xl p-6">
-                    <h4 class="font-bold text-slate-400 uppercase text-sm mb-4">Dompet Anda</h4>
-                    <div class="flex flex-wrap gap-3 justify-center">
-                        ${[100, 100, 50, 20, 10, 5, 1, 1, 1].map(val => `
-                            <div class="drag-item ${getMoneyClass(val)} font-bold p-3 rounded-xl border-b-4 text-lg shadow-sm cursor-grab active:cursor-grabbing" 
-                                 draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)" data-value="${val}">
-                                 RM${val}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="bg-orange-50 border-4 border-orange-200 rounded-3xl p-6 text-center">
-                    <div class="text-slate-500 font-bold text-xs uppercase">Harga Barang</div>
-                    <div class="text-6xl font-black text-orange-700 mb-6">RM ${price}</div>
-                    
-                    <div class="drop-zone bg-white rounded-xl p-4 mb-4 min-h-[120px] flex flex-wrap gap-2 justify-center content-start"
-                         ondrop="dropOnPayment(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                         <div class="text-slate-300 pointer-events-none self-center w-full">Seret wang ke sini</div>
+      content.innerHTML = `
+            <h3 class="text-xl font-bold text-orange-500 mb-2 text-center flex-none">🪙 Bayar & Baki (Operasi Tolak)</h3>
+            <div class="flex-1 overflow-y-auto px-4 w-full flex flex-col items-center">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl flex-none">
+                    <div class="bg-white border-2 border-slate-200 rounded-2xl p-2">
+                        <h4 class="font-bold text-slate-400 uppercase text-xs mb-2 text-center">Dompet Anda</h4>
+                        <div class="flex flex-wrap gap-1 justify-center">
+                            ${[100, 100, 50, 20, 10, 5, 1, 1, 1].map(val => `
+                                <div class="drag-item ${getMoneyClass(val)} font-bold p-2 rounded-lg border-b-4 text-sm shadow-sm cursor-grab active:cursor-grabbing" 
+                                     draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event)" data-value="${val}">
+                                     RM${val}
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
 
-                    <div class="bg-white rounded-xl p-3 border-2 border-orange-100">
-                        <div class="flex justify-between font-bold text-slate-600"><span>Dibayar:</span> <span id="pay-total">RM 0</span></div>
-                        <div class="flex justify-between font-bold text-orange-600 text-xl mt-1 border-t pt-1"><span>Baki:</span> <span id="change-due">...</span></div>
+                    <div class="bg-orange-50 border-4 border-orange-200 rounded-2xl p-4 text-center">
+                        <div class="text-slate-500 font-bold text-xs uppercase">Harga Barang</div>
+                        <div class="text-4xl font-black text-orange-700 mb-4">RM ${price}</div>
+                        
+                        <div class="drop-zone bg-white rounded-xl p-2 mb-2 min-h-[100px] flex flex-wrap gap-1 justify-center content-start"
+                             ondrop="dropOnPayment(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                             <div class="text-slate-300 pointer-events-none self-center w-full text-sm">Seret wang ke sini</div>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-2 border-2 border-orange-100 text-sm">
+                            <div class="flex justify-between font-bold text-slate-600"><span>Dibayar:</span> <span id="pay-total">RM 0</span></div>
+                            <div class="flex justify-between font-bold text-orange-600 text-lg mt-1 border-t pt-1"><span>Baki:</span> <span id="change-due">...</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
     }
 
-    window.dropOnPayment = function(e) {
-        e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
-        
-        // Remove placeholder
-        const ph = e.currentTarget.querySelector('.text-slate-300');
-        if(ph) ph.remove();
+    window.dropOnPayment = function (e) {
+      e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if (!draggedElement) return;
 
-        const val = parseFloat(draggedElement.dataset.value);
-        window.activityState.paid += val;
-        const { price, paid } = window.activityState;
+      // Remove placeholder
+      const ph = e.currentTarget.querySelector('.text-slate-300');
+      if (ph) ph.remove();
 
-        // Clone element to drop zone visually
-        const clone = draggedElement.cloneNode(true);
-        clone.draggable = false; clone.classList.remove('cursor-grab');
-        e.currentTarget.appendChild(clone);
-        draggedElement.remove(); draggedElement = null;
+      const val = parseFloat(draggedElement.dataset.value);
+      window.activityState.paid += val;
+      const { price, paid } = window.activityState;
 
-        document.getElementById('pay-total').textContent = `RM ${paid}`;
-        
-        if(paid < price) {
-            const need = price - paid;
-            document.getElementById('change-due').textContent = `Tak Cukup (Kurang RM${need})`;
-            speak(`Bayar RM${val}. Masih kurang RM${need}.`);
-        } else {
-            const change = paid - price;
-            document.getElementById('change-due').textContent = `RM ${change.toFixed(2)}`;
-            setInfo(`Baki anda ialah RM ${change.toFixed(2)}`);
-            speak(`Baki RM ${change.toFixed(2)}`);
-            triggerWin();
-        }
+      // Clone element to drop zone visually
+      const clone = draggedElement.cloneNode(true);
+      clone.draggable = false; clone.classList.remove('cursor-grab');
+      e.currentTarget.appendChild(clone);
+      draggedElement.remove(); draggedElement = null;
+
+      document.getElementById('pay-total').textContent = `RM ${paid}`;
+
+      if (paid < price) {
+        const need = price - paid;
+        document.getElementById('change-due').textContent = `Tak Cukup (Kurang RM${need})`;
+        speak(`Bayar RM${val}. Masih kurang RM${need}.`);
+      } else {
+        const change = paid - price;
+        document.getElementById('change-due').textContent = `RM ${change.toFixed(2)}`;
+        setInfo(`Baki anda ialah RM ${change.toFixed(2)}`);
+        speak(`Baki RM ${change.toFixed(2)}`);
+        triggerWin();
+      }
     }
 
     /* --- 5. BANDING NILAI --- */
     function loadCompareActivity(content) {
-        setInfo("Klik 'Kira' untuk lihat nilai sebenar.");
-        
-        // Data comparison
-        const partsA = [{q:2, v:100}, {q:1, v:10}]; // 210
-        const partsB = [{q:15, v:10}, {q:6, v:5}];  // 150 + 30 = 180
-        const valA = 210, valB = 180;
+      setInfo("Klik 'Kira' untuk lihat nilai sebenar.");
 
-        window.activityState = { valA, valB, revA: false, revB: false };
+      // Data comparison
+      const partsA = [{ q: 2, v: 100 }, { q: 1, v: 10 }]; // 210
+      const partsB = [{ q: 15, v: 10 }, { q: 6, v: 5 }];  // 150 + 30 = 180
+      const valA = 210, valB = 180;
 
-        content.innerHTML = `
-            <h3 class="text-4xl font-bold text-rose-500 mb-6 text-center">⚖️ Banding Nilai</h3>
-            <div class="flex flex-col md:flex-row gap-6 justify-center items-start">
-                
-                <div class="w-full md:w-1/2 bg-rose-50 border-4 border-rose-200 rounded-3xl p-6 text-center">
-                    <div class="text-6xl mb-4">🎁</div>
-                    <h4 class="font-bold text-rose-800 text-xl mb-2">Poket A</h4>
-                    <p class="text-slate-500 text-sm mb-4">(Nampak sikit: 2 keping RM100, 1 keping RM10)</p>
+      window.activityState = { valA, valB, revA: false, revB: false };
+
+      content.innerHTML = `
+            <h3 class="text-xl font-bold text-rose-500 mb-2 text-center flex-none">⚖️ Banding Nilai</h3>
+            <div class="flex-1 overflow-y-auto px-4 w-full flex flex-col items-center">
+                <div class="flex flex-col md:flex-row gap-4 justify-center items-start w-full max-w-4xl flex-none">
                     
-                    <button id="btn-a" onclick="reveal('A')" class="btn-3d bg-rose-500 text-white font-bold py-2 px-6 rounded-lg">Kira A</button>
-                    <div id="res-a" class="mt-4 font-black text-3xl text-rose-700 hidden">RM ${valA}</div>
-                </div>
+                    <div class="w-full md:w-1/2 bg-rose-50 border-4 border-rose-200 rounded-2xl p-4 text-center">
+                        <div class="text-4xl mb-2">🎁</div>
+                        <h4 class="font-bold text-rose-800 text-lg mb-1">Poket A</h4>
+                        <p class="text-slate-500 text-xs mb-2">(Nampak sikit: 2x RM100, 1x RM10)</p>
+                        
+                        <button id="btn-a" onclick="reveal('A')" class="btn-3d bg-rose-500 text-white font-bold py-1.5 px-4 rounded-lg text-sm">Kira A</button>
+                        <div id="res-a" class="mt-2 font-black text-2xl text-rose-700 hidden">RM ${valA}</div>
+                    </div>
 
-                <div id="comp-sym" class="self-center text-6xl font-black text-slate-300">?</div>
+                    <div id="comp-sym" class="self-center text-4xl font-black text-slate-300">?</div>
 
-                <div class="w-full md:w-1/2 bg-blue-50 border-4 border-blue-200 rounded-3xl p-6 text-center">
-                    <div class="text-6xl mb-4">🛍️</div>
-                    <h4 class="font-bold text-blue-800 text-xl mb-2">Poket B</h4>
-                    <p class="text-slate-500 text-sm mb-4">(Nampak banyak: 15 keping RM10, 6 keping RM5)</p>
-                    
-                    <button id="btn-b" onclick="reveal('B')" class="btn-3d bg-blue-500 text-white font-bold py-2 px-6 rounded-lg">Kira B</button>
-                    <div id="res-b" class="mt-4 font-black text-3xl text-blue-700 hidden">RM ${valB}</div>
+                    <div class="w-full md:w-1/2 bg-blue-50 border-4 border-blue-200 rounded-2xl p-4 text-center">
+                        <div class="text-4xl mb-2">🛍️</div>
+                        <h4 class="font-bold text-blue-800 text-lg mb-1">Poket B</h4>
+                        <p class="text-slate-500 text-xs mb-2">(Nampak banyak: 15x RM10, 6x RM5)</p>
+                        
+                        <button id="btn-b" onclick="reveal('B')" class="btn-3d bg-blue-500 text-white font-bold py-1.5 px-4 rounded-lg text-sm">Kira B</button>
+                        <div id="res-b" class="mt-2 font-black text-2xl text-blue-700 hidden">RM ${valB}</div>
+                    </div>
                 </div>
+                <div id="final-msg" class="text-center mt-4 text-lg font-bold text-slate-600"></div>
             </div>
-            <div id="final-msg" class="text-center mt-8 text-xl font-bold text-slate-600"></div>
         `;
     }
 
-    window.reveal = function(side) {
-        if(side === 'A') {
-            window.activityState.revA = true;
-            document.getElementById('res-a').classList.remove('hidden');
-            document.getElementById('btn-a').disabled = true;
-            speak("Poket A ialah RM 210");
-        } else {
-            window.activityState.revB = true;
-            document.getElementById('res-b').classList.remove('hidden');
-            document.getElementById('btn-b').disabled = true;
-            speak("Poket B ialah RM 180");
-        }
+    window.reveal = function (side) {
+      if (side === 'A') {
+        window.activityState.revA = true;
+        document.getElementById('res-a').classList.remove('hidden');
+        document.getElementById('btn-a').disabled = true;
+        speak("Poket A ialah RM 210");
+      } else {
+        window.activityState.revB = true;
+        document.getElementById('res-b').classList.remove('hidden');
+        document.getElementById('btn-b').disabled = true;
+        speak("Poket B ialah RM 180");
+      }
 
-        if(window.activityState.revA && window.activityState.revB) {
-            const sym = document.getElementById('comp-sym');
-            const msg = document.getElementById('final-msg');
-            if(window.activityState.valA > window.activityState.valB) {
-                sym.textContent = ">";
-                sym.className = "self-center text-8xl font-black text-rose-600 animate-bounce";
-                msg.textContent = "Walaupun Poket A nampak sedikit kepingnya, nilainya lebih besar!";
-                speak("Poket A lebih besar nilainya.");
-                triggerWin();
-            }
+      if (window.activityState.revA && window.activityState.revB) {
+        const sym = document.getElementById('comp-sym');
+        const msg = document.getElementById('final-msg');
+        if (window.activityState.valA > window.activityState.valB) {
+          sym.textContent = ">";
+          sym.className = "self-center text-8xl font-black text-rose-600 animate-bounce";
+          msg.textContent = "Walaupun Poket A nampak sedikit kepingnya, nilainya lebih besar!";
+          speak("Poket A lebih besar nilainya.");
+          triggerWin();
         }
+      }
     }
 
     if ('speechSynthesis' in window) { setInterval(() => { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); }, 1000); }
   </script>
 </body>
+
 </html>
